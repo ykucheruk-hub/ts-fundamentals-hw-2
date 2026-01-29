@@ -1,7 +1,8 @@
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  define: {
-    global: {},
+  base: "/ts-fundamentals-hw-2/",
+  build: {
+    sourcemap: true,
   },
 });
