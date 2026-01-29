@@ -1,13 +1,15 @@
 import { getImagesByQuery } from "./pixabay-api";
 import { initRender } from "./render-functions";
 import Pagination from "./pagination";
+import type { PixabayResponse } from "./types/pixabay";
 
 const pagination = new Pagination();
 let query = "";
-const searchForm = document.querySelector(".form");
-const loadMoreButton = document.querySelector(".load-more");
-const gallery = document.querySelector(".gallery");
-const loader = document.querySelector(".loader");
+
+const searchForm = document.querySelector<HTMLFormElement>(".form");
+const loadMoreButton = document.querySelector<HTMLButtonElement>(".load-more");
+const gallery = document.querySelector<HTMLElement>(".gallery");
+const loader = document.querySelector<HTMLElement>(".loader");
 
 if (!searchForm) throw new Error("Missing .form element in HTML");
 if (!loadMoreButton) throw new Error("Missing .load-more element in HTML");
@@ -20,11 +22,14 @@ const ui = initRender({ gallery, loader, loadMoreButton });
 searchForm.addEventListener("submit", onFormSubmit);
 loadMoreButton.addEventListener("click", onLoadMoreClick);
 
-async function onFormSubmit(event) {
+async function onFormSubmit(event:SubmitEvent):Promise<void> {
   event.preventDefault();
-  const form = event.target;
+
+  const form = event.currentTarget as HTMLFormElement;
   const formData = new FormData(form);
-  query = formData.get("search-text").trim();
+  const searchText = formData.get("search-text");
+  
+  query = typeof searchText === "string" ? searchText.trim() : "";
 
   if (query === "") {
     ui.showToast("Please enter a search query.");
@@ -38,18 +43,18 @@ async function onFormSubmit(event) {
   form.reset();
 }
 
-async function onLoadMoreClick() {
+async function onLoadMoreClick():Promise<void> {
   pagination.next();
   await fetchAndRender();
 }
 
-async function fetchAndRender() {
+async function fetchAndRender():Promise<void> {
   const isInitial = pagination.current === 1;
   try {
     ui.showLoader();
     ui.hideLoadMoreButton();
 
-    const data = await getImagesByQuery(query, pagination.current);
+    const data:PixabayResponse = await getImagesByQuery(query, pagination.current);
 
     if (isInitial && data.hits.length === 0) {
       ui.showToast(

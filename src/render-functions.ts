@@ -4,9 +4,21 @@ import type { PixabayImage } from "./types/pixabay";
 import "izitoast/dist/css/iziToast.min.css";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
-type RenderAPI = {};
+type RenderAPI = {
+  showLoader: () => void;
+  hideLoader: () => void;
+  showLoadMoreButton: () => void;
+  hideLoadMoreButton: () => void;
+  clearGallery: () => void;
+  createGallery: (images: PixabayImage[]) => void;
+  showToast: (message: string) => void;
+};
 
-type RenderElements = {};
+type RenderElements = {
+  gallery: HTMLElement;
+  loader: HTMLElement;
+  loadMoreButton: HTMLElement;
+};
 
 export function initRender(elements: RenderElements): RenderAPI {
   const { gallery, loader, loadMoreButton } = elements;
@@ -20,7 +32,7 @@ export function initRender(elements: RenderElements): RenderAPI {
     captionDelay: 250,
   });
 
-  const createGallery = (images) => {
+  const createGallery = (images:PixabayImage[]) => {
     const galleryItems = images
       .map(
         (image) => `
